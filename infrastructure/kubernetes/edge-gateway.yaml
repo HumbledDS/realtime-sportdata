@@ -1,0 +1,102 @@
+# ============================================================
+# Kubernetes Deployment — Edge Gateway
+# ============================================================
+# Deployed at each stadium with local SSD for WAL persistence.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edge-gateway
+  namespace: sportdata
+  labels:
+    app: edge-gateway
+    tier: ingestion
+spec:
+  replicas: 2  # Active-passive for HA at each venue
+  selector:
+    matchLabels:
+      app: edge-gateway
+  template:
+    metadata:
+      labels:
+        app: edge-gateway
+        tier: ingestion
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+    spec:
+      containers:
+        - name: edge-gateway
+          image: registry.sportdata.io/edge-gateway:latest
+          ports:
+            - containerPort: 8080
+              name: health
+            - containerPort: 9090
+              name: metrics
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-config
+                  key: bootstrap-servers
+            - name: GATEWAY_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          volumeMounts:
+            - name: wal-storage
+              mountPath: /data/wal
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: wal-storage
+          persistentVolumeClaim:
+            claimName: edge-gateway-wal-pvc
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: edge-gateway-wal-pvc
+  namespace: sportdata
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: fast-ssd  # Local NVMe at the stadium
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: edge-gateway
+  namespace: sportdata
+spec:
+  selector:
+    app: edge-gateway
+  ports:
+    - name: health
+      port: 8080
+      targetPort: 8080
+    - name: metrics
+      port: 9090
+      targetPort: 9090

@@ -1,0 +1,220 @@
+{
+    "dashboard": {
+        "title": "Real-Time Sports Data — Pipeline Overview",
+        "description": "End-to-end pipeline observability for the sports event streaming system",
+        "tags": [
+            "sports",
+            "realtime",
+            "pipeline"
+        ],
+        "timezone": "UTC",
+        "refresh": "5s",
+        "panels": [
+            {
+                "title": "📊 Event Throughput (events/sec)",
+                "type": "timeseries",
+                "gridPos": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 12,
+                    "h": 8
+                },
+                "targets": [
+                    {
+                        "expr": "rate(gateway_events_produced_total[1m])",
+                        "legendFormat": "{{event_type}} - Produced"
+                    },
+                    {
+                        "expr": "rate(gateway_events_received_total[1m])",
+                        "legendFormat": "{{source}} - Received"
+                    }
+                ]
+            },
+            {
+                "title": "⏱️ End-to-End Latency (P50 / P95 / P99)",
+                "type": "timeseries",
+                "gridPos": {
+                    "x": 12,
+                    "y": 0,
+                    "w": 12,
+                    "h": 8
+                },
+                "targets": [
+                    {
+                        "expr": "histogram_quantile(0.50, rate(gateway_event_processing_seconds_bucket[5m]))",
+                        "legendFormat": "P50"
+                    },
+                    {
+                        "expr": "histogram_quantile(0.95, rate(gateway_event_processing_seconds_bucket[5m]))",
+                        "legendFormat": "P95"
+                    },
+                    {
+                        "expr": "histogram_quantile(0.99, rate(gateway_event_processing_seconds_bucket[5m]))",
+                        "legendFormat": "P99"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "unit": "s",
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "value": 0,
+                                    "color": "green"
+                                },
+                                {
+                                    "value": 1,
+                                    "color": "yellow"
+                                },
+                                {
+                                    "value": 3,
+                                    "color": "red"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                "title": "📝 WAL Pending Events",
+                "type": "gauge",
+                "gridPos": {
+                    "x": 0,
+                    "y": 8,
+                    "w": 6,
+                    "h": 6
+                },
+                "targets": [
+                    {
+                        "expr": "gateway_wal_pending_events",
+                        "legendFormat": "Pending"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "value": 0,
+                                    "color": "green"
+                                },
+                                {
+                                    "value": 100,
+                                    "color": "yellow"
+                                },
+                                {
+                                    "value": 1000,
+                                    "color": "red"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                "title": "🔄 Kafka Consumer Lag",
+                "type": "timeseries",
+                "gridPos": {
+                    "x": 6,
+                    "y": 8,
+                    "w": 9,
+                    "h": 6
+                },
+                "targets": [
+                    {
+                        "expr": "kafka_consumer_group_lag",
+                        "legendFormat": "{{group}} / {{topic}}"
+                    }
+                ]
+            },
+            {
+                "title": "🌐 WebSocket Connections",
+                "type": "stat",
+                "gridPos": {
+                    "x": 15,
+                    "y": 8,
+                    "w": 4,
+                    "h": 6
+                },
+                "targets": [
+                    {
+                        "expr": "ws_gateway_active_connections",
+                        "legendFormat": "Active"
+                    }
+                ]
+            },
+            {
+                "title": "❌ Deduplication Rate",
+                "type": "timeseries",
+                "gridPos": {
+                    "x": 19,
+                    "y": 8,
+                    "w": 5,
+                    "h": 6
+                },
+                "targets": [
+                    {
+                        "expr": "rate(gateway_events_deduplicated_total[5m])",
+                        "legendFormat": "Duplicates/sec"
+                    }
+                ]
+            },
+            {
+                "title": "📱 Push Notifications Sent",
+                "type": "timeseries",
+                "gridPos": {
+                    "x": 0,
+                    "y": 14,
+                    "w": 12,
+                    "h": 6
+                },
+                "targets": [
+                    {
+                        "expr": "rate(push_notifications_sent_total[5m])",
+                        "legendFormat": "{{platform}} - {{event_type}}"
+                    },
+                    {
+                        "expr": "rate(push_notifications_failed_total[5m])",
+                        "legendFormat": "FAILED - {{platform}}"
+                    }
+                ]
+            },
+            {
+                "title": "🏟️ Active Matches",
+                "type": "stat",
+                "gridPos": {
+                    "x": 12,
+                    "y": 14,
+                    "w": 6,
+                    "h": 6
+                },
+                "targets": [
+                    {
+                        "expr": "count(match_status == 'LIVE')",
+                        "legendFormat": "Live Matches"
+                    }
+                ]
+            },
+            {
+                "title": "💾 Storage Health",
+                "type": "table",
+                "gridPos": {
+                    "x": 18,
+                    "y": 14,
+                    "w": 6,
+                    "h": 6
+                },
+                "targets": [
+                    {
+                        "expr": "redis_used_memory_bytes",
+                        "legendFormat": "Redis Memory"
+                    },
+                    {
+                        "expr": "pg_database_size_bytes{datname='sportdata'}",
+                        "legendFormat": "PostgreSQL Size"
+                    }
+                ]
+            }
+        ]
+    }
+}

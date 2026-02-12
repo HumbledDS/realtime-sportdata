@@ -1,0 +1,195 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "MatchState",
+    "description": "Events for match lifecycle: KICK_OFF, HALF_TIME, FULL_TIME, INJURY_STOPPAGE, MATCH_ABANDONED",
+    "type": "object",
+    "required": [
+        "event_id",
+        "event_type",
+        "event_version",
+        "match_id",
+        "occurred_at",
+        "received_at",
+        "data"
+    ],
+    "properties": {
+        "event_id": {
+            "type": "string",
+            "format": "uuid"
+        },
+        "event_type": {
+            "type": "string",
+            "enum": [
+                "KICK_OFF",
+                "HALF_TIME",
+                "FULL_TIME",
+                "INJURY_STOPPAGE",
+                "MATCH_ABANDONED"
+            ]
+        },
+        "event_version": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "match_id": {
+            "type": "string"
+        },
+        "competition": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "matchday": {
+                    "type": "integer"
+                }
+            }
+        },
+        "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "received_at": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "published_at": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "sequence_number": {
+            "type": "integer"
+        },
+        "source": {
+            "type": "object",
+            "properties": {
+                "system": {
+                    "type": "string"
+                },
+                "operator_id": {
+                    "type": "string"
+                },
+                "confidence": {
+                    "type": "number"
+                },
+                "stadium_gateway_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "data": {
+            "type": "object",
+            "required": [
+                "match_minute"
+            ],
+            "properties": {
+                "match_minute": {
+                    "type": "integer"
+                },
+                "match_period": {
+                    "type": "string",
+                    "enum": [
+                        "PRE_MATCH",
+                        "FIRST_HALF",
+                        "HALF_TIME_BREAK",
+                        "SECOND_HALF",
+                        "FIRST_EXTRA",
+                        "SECOND_EXTRA",
+                        "PENALTIES",
+                        "POST_MATCH"
+                    ]
+                },
+                "added_time": {
+                    "type": "integer",
+                    "default": 0
+                },
+                "current_score": {
+                    "type": "object",
+                    "properties": {
+                        "home": {
+                            "type": "integer"
+                        },
+                        "away": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "home_team": {
+                    "type": "object",
+                    "properties": {
+                        "team_id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "away_team": {
+                    "type": "object",
+                    "properties": {
+                        "team_id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "abandon_reason": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "enum": [
+                        "WEATHER",
+                        "CROWD_TROUBLE",
+                        "FLOODLIGHT_FAILURE",
+                        "PLAYER_ILLNESS",
+                        "OTHER",
+                        null
+                    ],
+                    "description": "Only populated for MATCH_ABANDONED events"
+                },
+                "stoppage_reason": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "enum": [
+                        "INJURY",
+                        "HEAD_INJURY",
+                        "MEDICAL_EMERGENCY",
+                        "CROWD_INCIDENT",
+                        "OTHER",
+                        null
+                    ],
+                    "description": "Only populated for INJURY_STOPPAGE events"
+                }
+            }
+        },
+        "metadata": {
+            "type": "object",
+            "properties": {
+                "idempotency_key": {
+                    "type": "string"
+                },
+                "correlation_id": {
+                    "type": "string"
+                },
+                "causation_id": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "ttl_seconds": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

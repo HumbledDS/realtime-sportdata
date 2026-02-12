@@ -1,0 +1,132 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "BaseMatchEvent",
+    "description": "Abstract base schema for all match events. Every event type extends this base.",
+    "type": "object",
+    "required": [
+        "event_id",
+        "event_type",
+        "event_version",
+        "match_id",
+        "occurred_at",
+        "received_at"
+    ],
+    "properties": {
+        "event_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Globally unique, idempotent event identifier (UUIDv7 for time-ordering)"
+        },
+        "event_type": {
+            "type": "string",
+            "enum": [
+                "GOAL_SCORED",
+                "GOAL_DISALLOWED",
+                "PENALTY_AWARDED",
+                "PENALTY_MISSED",
+                "YELLOW_CARD",
+                "RED_CARD",
+                "SUBSTITUTION",
+                "VAR_REVIEW_STARTED",
+                "VAR_DECISION",
+                "OFFSIDE",
+                "CORNER_KICK",
+                "FREE_KICK",
+                "HALF_TIME",
+                "FULL_TIME",
+                "KICK_OFF",
+                "INJURY_STOPPAGE",
+                "MATCH_ABANDONED"
+            ],
+            "description": "Discriminator for polymorphic event routing"
+        },
+        "event_version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Schema version for backward/forward compatibility"
+        },
+        "match_id": {
+            "type": "string",
+            "description": "Unique identifier for the match (league-season-fixture format)"
+        },
+        "competition": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "matchday": {
+                    "type": "integer"
+                }
+            }
+        },
+        "occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the event physically happened (event time), ISO 8601 UTC"
+        },
+        "received_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the stadium gateway received the event (ingestion time)"
+        },
+        "published_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the event was published to Kafka (processing time)"
+        },
+        "sequence_number": {
+            "type": "integer",
+            "description": "Monotonically increasing per match for total ordering"
+        },
+        "source": {
+            "type": "object",
+            "properties": {
+                "system": {
+                    "type": "string",
+                    "enum": [
+                        "HAWK_EYE",
+                        "OPTA",
+                        "REFEREE_COMMS",
+                        "MANUAL_OPERATOR",
+                        "VAR"
+                    ]
+                },
+                "operator_id": {
+                    "type": "string"
+                },
+                "confidence": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "stadium_gateway_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "metadata": {
+            "type": "object",
+            "properties": {
+                "idempotency_key": {
+                    "type": "string"
+                },
+                "correlation_id": {
+                    "type": "string"
+                },
+                "causation_id": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "ttl_seconds": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

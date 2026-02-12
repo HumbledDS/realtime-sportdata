@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GoalScored",
+  "description": "Canonical event emitted when a goal is confirmed in a live match",
+  "type": "object",
+  "required": [
+    "event_id", "event_type", "event_version", "match_id",
+    "occurred_at", "received_at", "data"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Globally unique, idempotent event identifier (UUIDv7 for time-ordering)",
+      "example": "0190d4a2-7b3c-7d4e-8f5a-1b2c3d4e5f6a"
+    },
+    "event_type": {
+      "type": "string",
+      "const": "GOAL_SCORED",
+      "description": "Discriminator for polymorphic event routing"
+    },
+    "event_version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Schema version for backward/forward compatibility",
+      "example": 3
+    },
+    "match_id": {
+      "type": "string",
+      "description": "Unique identifier for the match (league-season-fixture format)",
+      "example": "LFP-2425-PSG-OM-0315"
+    },
+    "competition": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "example": "ligue1-2024-25" },
+        "name": { "type": "string", "example": "Ligue 1 2024-25" },
+        "matchday": { "type": "integer", "example": 28 }
+      }
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the goal physically happened (event time), ISO 8601 UTC",
+      "example": "2025-03-15T20:37:12.450Z"
+    },
+    "received_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the stadium gateway received the event (ingestion time)",
+      "example": "2025-03-15T20:37:12.823Z"
+    },
+    "published_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the event was published to Kafka (processing time)",
+      "example": "2025-03-15T20:37:13.001Z"
+    },
+    "sequence_number": {
+      "type": "integer",
+      "description": "Monotonically increasing per match. Enables total ordering within a match.",
+      "example": 47
+    },
+    "source": {
+      "type": "object",
+      "description": "Provenance of the event",
+      "properties": {
+        "system": {
+          "type": "string",
+          "enum": ["HAWK_EYE", "OPTA", "REFEREE_COMMS", "MANUAL_OPERATOR", "VAR"],
+          "example": "OPTA"
+        },
+        "operator_id": { "type": "string", "example": "opta-op-FR-042" },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Confidence score (1.0 = confirmed by referee)",
+          "example": 1.0
+        },
+        "stadium_gateway_id": { "type": "string", "example": "gw-parc-des-princes-01" }
+      }
+    },
+    "data": {
+      "type": "object",
+      "description": "Goal-specific payload",
+      "required": ["scorer", "team", "match_minute", "score_after"],
+      "properties": {
+        "scorer": {
+          "type": "object",
+          "properties": {
+            "player_id": { "type": "string", "example": "PLR-DEMBELE-10" },
+            "name": { "type": "string", "example": "Ousmane Dembélé" },
+            "jersey_number": { "type": "integer", "example": 10 },
+            "position": { "type": "string", "example": "FW" }
+          }
+        },
+        "assist": {
+          "type": ["object", "null"],
+          "properties": {
+            "player_id": { "type": "string", "example": "PLR-MAYULU-24" },
+            "name": { "type": "string", "example": "Senny Mayulu" },
+            "assist_type": {
+              "type": "string",
+              "enum": ["PASS", "CROSS", "THROUGH_BALL", "CORNER", "FREE_KICK", "THROW_IN"],
+              "example": "THROUGH_BALL"
+            }
+          }
+        },
+        "team": {
+          "type": "object",
+          "properties": {
+            "team_id": { "type": "string", "example": "TEAM-PSG" },
+            "name": { "type": "string", "example": "Paris Saint-Germain" },
+            "side": { "type": "string", "enum": ["HOME", "AWAY"], "example": "HOME" }
+          }
+        },
+        "match_minute": { "type": "integer", "example": 37 },
+        "match_period": {
+          "type": "string",
+          "enum": ["FIRST_HALF", "SECOND_HALF", "FIRST_EXTRA", "SECOND_EXTRA"],
+          "example": "FIRST_HALF"
+        },
+        "added_time": { "type": "integer", "default": 0, "example": 0 },
+        "score_after": {
+          "type": "object",
+          "properties": {
+            "home": { "type": "integer", "example": 2 },
+            "away": { "type": "integer", "example": 0 }
+          }
+        },
+        "goal_type": {
+          "type": "string",
+          "enum": ["OPEN_PLAY", "PENALTY", "FREE_KICK", "HEADER", "OWN_GOAL", "CORNER"],
+          "example": "OPEN_PLAY"
+        },
+        "body_part": {
+          "type": "string",
+          "enum": ["RIGHT_FOOT", "LEFT_FOOT", "HEAD", "OTHER"],
+          "example": "LEFT_FOOT"
+        },
+        "coordinates": {
+          "type": "object",
+          "description": "Pitch coordinates (normalized 0-100)",
+          "properties": {
+            "x": { "type": "number", "example": 92.3 },
+            "y": { "type": "number", "example": 45.1 }
+          }
+        },
+        "expected_goals": {
+          "type": "number",
+          "description": "xG value of the chance",
+          "example": 0.76
+        },
+        "var_reviewed": { "type": "boolean", "default": false },
+        "var_decision": {
+          "type": ["string", "null"],
+          "enum": ["CONFIRMED", "DISALLOWED", null],
+          "default": null
+        },
+        "video_clip_url": {
+          "type": ["string", "null"],
+          "format": "uri",
+          "description": "URL to replay clip (populated async, initially null)"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "idempotency_key": {
+          "type": "string",
+          "description": "Hash of (match_id + event_type + match_minute + scorer.player_id) for dedup",
+          "example": "sha256:a3f2b8c1d4e5..."
+        },
+        "correlation_id": {
+          "type": "string",
+          "description": "Links related events (e.g., goal + VAR review + celebration)",
+          "example": "corr-0190d4a2-goal-37"
+        },
+        "causation_id": {
+          "type": ["string", "null"],
+          "description": "The event_id that caused this event (e.g., penalty_awarded → goal_scored)"
+        },
+        "ttl_seconds": {
+          "type": "integer",
+          "description": "Time-to-live for cache/notification relevance",
+          "example": 300
+        }
+      }
+    }
+  }
+}

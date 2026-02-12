@@ -1,0 +1,189 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "YellowCard",
+    "description": "Event emitted when a yellow card is shown to a player",
+    "type": "object",
+    "required": [
+        "event_id",
+        "event_type",
+        "event_version",
+        "match_id",
+        "occurred_at",
+        "received_at",
+        "data"
+    ],
+    "properties": {
+        "event_id": {
+            "type": "string",
+            "format": "uuid"
+        },
+        "event_type": {
+            "type": "string",
+            "const": "YELLOW_CARD"
+        },
+        "event_version": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "match_id": {
+            "type": "string"
+        },
+        "competition": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "matchday": {
+                    "type": "integer"
+                }
+            }
+        },
+        "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "received_at": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "published_at": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "sequence_number": {
+            "type": "integer"
+        },
+        "source": {
+            "type": "object",
+            "properties": {
+                "system": {
+                    "type": "string"
+                },
+                "operator_id": {
+                    "type": "string"
+                },
+                "confidence": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "stadium_gateway_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "data": {
+            "type": "object",
+            "required": [
+                "player",
+                "team",
+                "match_minute",
+                "reason"
+            ],
+            "properties": {
+                "player": {
+                    "type": "object",
+                    "properties": {
+                        "player_id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "jersey_number": {
+                            "type": "integer"
+                        },
+                        "position": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "team": {
+                    "type": "object",
+                    "properties": {
+                        "team_id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "side": {
+                            "type": "string",
+                            "enum": [
+                                "HOME",
+                                "AWAY"
+                            ]
+                        }
+                    }
+                },
+                "match_minute": {
+                    "type": "integer"
+                },
+                "match_period": {
+                    "type": "string",
+                    "enum": [
+                        "FIRST_HALF",
+                        "SECOND_HALF",
+                        "FIRST_EXTRA",
+                        "SECOND_EXTRA"
+                    ]
+                },
+                "added_time": {
+                    "type": "integer",
+                    "default": 0
+                },
+                "reason": {
+                    "type": "string",
+                    "enum": [
+                        "FOUL",
+                        "UNSPORTING_BEHAVIOUR",
+                        "DISSENT",
+                        "TIME_WASTING",
+                        "SIMULATION",
+                        "ENCROACHMENT",
+                        "OTHER"
+                    ]
+                },
+                "is_second_yellow": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "coordinates": {
+                    "type": "object",
+                    "properties": {
+                        "x": {
+                            "type": "number"
+                        },
+                        "y": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        },
+        "metadata": {
+            "type": "object",
+            "properties": {
+                "idempotency_key": {
+                    "type": "string"
+                },
+                "correlation_id": {
+                    "type": "string"
+                },
+                "causation_id": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "ttl_seconds": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

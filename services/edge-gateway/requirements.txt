@@ -1,0 +1,13 @@
+confluent-kafka[avro]==2.6.1
+pydantic==2.10.3
+jsonschema==4.23.0
+structlog==24.4.0
+prometheus-client==0.21.1
+grpcio==1.68.1
+protobuf==5.29.2
+uvicorn==0.34.0
+fastapi==0.115.6
+aiofiles==24.1.0
+redis==5.2.1
+uuid7==0.1.0
+cryptography==44.0.0

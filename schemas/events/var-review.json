@@ -1,0 +1,149 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "VARReview",
+    "description": "Event emitted when a VAR review is initiated or decided",
+    "type": "object",
+    "required": [
+        "event_id",
+        "event_type",
+        "event_version",
+        "match_id",
+        "occurred_at",
+        "received_at",
+        "data"
+    ],
+    "properties": {
+        "event_id": {
+            "type": "string",
+            "format": "uuid"
+        },
+        "event_type": {
+            "type": "string",
+            "enum": [
+                "VAR_REVIEW_STARTED",
+                "VAR_DECISION"
+            ]
+        },
+        "event_version": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "match_id": {
+            "type": "string"
+        },
+        "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "received_at": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "published_at": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "sequence_number": {
+            "type": "integer"
+        },
+        "source": {
+            "type": "object",
+            "properties": {
+                "system": {
+                    "type": "string"
+                },
+                "operator_id": {
+                    "type": "string"
+                },
+                "confidence": {
+                    "type": "number"
+                },
+                "stadium_gateway_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "data": {
+            "type": "object",
+            "required": [
+                "review_type",
+                "match_minute"
+            ],
+            "properties": {
+                "review_type": {
+                    "type": "string",
+                    "enum": [
+                        "GOAL",
+                        "PENALTY",
+                        "RED_CARD",
+                        "MISTAKEN_IDENTITY"
+                    ],
+                    "description": "The type of incident being reviewed"
+                },
+                "original_event_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The event_id of the incident under review"
+                },
+                "decision": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "enum": [
+                        "CONFIRMED",
+                        "OVERTURNED",
+                        "PENALTY_AWARDED",
+                        "PENALTY_CANCELLED",
+                        null
+                    ],
+                    "description": "null when VAR_REVIEW_STARTED, populated on VAR_DECISION"
+                },
+                "match_minute": {
+                    "type": "integer"
+                },
+                "match_period": {
+                    "type": "string",
+                    "enum": [
+                        "FIRST_HALF",
+                        "SECOND_HALF",
+                        "FIRST_EXTRA",
+                        "SECOND_EXTRA"
+                    ]
+                },
+                "review_duration_seconds": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ],
+                    "description": "Time taken for the VAR review (populated on VAR_DECISION)"
+                },
+                "on_field_review": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Whether the referee went to the monitor for an on-field review"
+                }
+            }
+        },
+        "metadata": {
+            "type": "object",
+            "properties": {
+                "idempotency_key": {
+                    "type": "string"
+                },
+                "correlation_id": {
+                    "type": "string"
+                },
+                "causation_id": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "ttl_seconds": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

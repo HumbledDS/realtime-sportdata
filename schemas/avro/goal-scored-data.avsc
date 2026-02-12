@@ -1,0 +1,81 @@
+{
+  "type": "record",
+  "name": "GoalScoredData",
+  "namespace": "com.realtime.sportdata.events.data",
+  "doc": "Goal-specific payload for GOAL_SCORED events",
+  "fields": [
+    { "name": "scorer", "type": {
+      "type": "record",
+      "name": "Player",
+      "fields": [
+        { "name": "player_id", "type": "string" },
+        { "name": "name", "type": "string" },
+        { "name": "jersey_number", "type": "int" },
+        { "name": "position", "type": "string" }
+      ]
+    }},
+    { "name": "assist", "type": ["null", {
+      "type": "record",
+      "name": "Assist",
+      "fields": [
+        { "name": "player_id", "type": "string" },
+        { "name": "name", "type": "string" },
+        { "name": "assist_type", "type": {
+          "type": "enum",
+          "name": "AssistType",
+          "symbols": ["PASS", "CROSS", "THROUGH_BALL", "CORNER", "FREE_KICK", "THROW_IN"]
+        }}
+      ]
+    }], "default": null },
+    { "name": "team", "type": {
+      "type": "record",
+      "name": "Team",
+      "fields": [
+        { "name": "team_id", "type": "string" },
+        { "name": "name", "type": "string" },
+        { "name": "side", "type": {
+          "type": "enum",
+          "name": "Side",
+          "symbols": ["HOME", "AWAY"]
+        }}
+      ]
+    }},
+    { "name": "match_minute", "type": "int" },
+    { "name": "match_period", "type": {
+      "type": "enum",
+      "name": "MatchPeriod",
+      "symbols": ["FIRST_HALF", "SECOND_HALF", "FIRST_EXTRA", "SECOND_EXTRA"]
+    }},
+    { "name": "added_time", "type": "int", "default": 0 },
+    { "name": "score_after", "type": {
+      "type": "record",
+      "name": "Score",
+      "fields": [
+        { "name": "home", "type": "int" },
+        { "name": "away", "type": "int" }
+      ]
+    }},
+    { "name": "goal_type", "type": {
+      "type": "enum",
+      "name": "GoalType",
+      "symbols": ["OPEN_PLAY", "PENALTY", "FREE_KICK", "HEADER", "OWN_GOAL", "CORNER"]
+    }},
+    { "name": "body_part", "type": {
+      "type": "enum",
+      "name": "BodyPart",
+      "symbols": ["RIGHT_FOOT", "LEFT_FOOT", "HEAD", "OTHER"]
+    }},
+    { "name": "coordinates", "type": ["null", {
+      "type": "record",
+      "name": "Coordinates",
+      "fields": [
+        { "name": "x", "type": "double" },
+        { "name": "y", "type": "double" }
+      ]
+    }], "default": null },
+    { "name": "expected_goals", "type": ["null", "double"], "default": null },
+    { "name": "var_reviewed", "type": "boolean", "default": false },
+    { "name": "var_decision", "type": ["null", "string"], "default": null },
+    { "name": "video_clip_url", "type": ["null", "string"], "default": null }
+  ]
+}

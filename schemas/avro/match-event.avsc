@@ -1,0 +1,59 @@
+{
+  "type": "record",
+  "name": "MatchEvent",
+  "namespace": "com.realtime.sportdata.events",
+  "doc": "Base Avro schema for all match events. Used by Confluent Schema Registry.",
+  "fields": [
+    { "name": "event_id", "type": "string", "doc": "UUIDv7 — time-ordered, globally unique" },
+    { "name": "event_type", "type": {
+      "type": "enum",
+      "name": "EventType",
+      "symbols": [
+        "GOAL_SCORED", "GOAL_DISALLOWED", "PENALTY_AWARDED", "PENALTY_MISSED",
+        "YELLOW_CARD", "RED_CARD", "SUBSTITUTION", "VAR_REVIEW_STARTED", "VAR_DECISION",
+        "OFFSIDE", "CORNER_KICK", "FREE_KICK", "HALF_TIME", "FULL_TIME",
+        "KICK_OFF", "INJURY_STOPPAGE", "MATCH_ABANDONED"
+      ]
+    }},
+    { "name": "event_version", "type": "int", "default": 1 },
+    { "name": "match_id", "type": "string" },
+    { "name": "competition", "type": ["null", {
+      "type": "record",
+      "name": "Competition",
+      "fields": [
+        { "name": "id", "type": "string" },
+        { "name": "name", "type": "string" },
+        { "name": "matchday", "type": "int" }
+      ]
+    }], "default": null },
+    { "name": "occurred_at", "type": { "type": "long", "logicalType": "timestamp-millis" }, "doc": "Event time — when it happened on the pitch" },
+    { "name": "received_at", "type": { "type": "long", "logicalType": "timestamp-millis" }, "doc": "Ingestion time — when gateway received it" },
+    { "name": "published_at", "type": ["null", { "type": "long", "logicalType": "timestamp-millis" }], "default": null, "doc": "Processing time — when Kafka persisted it" },
+    { "name": "sequence_number", "type": "int", "doc": "Monotonically increasing per match" },
+    { "name": "source", "type": {
+      "type": "record",
+      "name": "EventSource",
+      "fields": [
+        { "name": "system", "type": {
+          "type": "enum",
+          "name": "SourceSystem",
+          "symbols": ["HAWK_EYE", "OPTA", "REFEREE_COMMS", "MANUAL_OPERATOR", "VAR"]
+        }},
+        { "name": "operator_id", "type": ["null", "string"], "default": null },
+        { "name": "confidence", "type": "double", "default": 1.0 },
+        { "name": "stadium_gateway_id", "type": "string" }
+      ]
+    }},
+    { "name": "data", "type": "bytes", "doc": "Event-type-specific payload, encoded as nested Avro or JSON" },
+    { "name": "metadata", "type": {
+      "type": "record",
+      "name": "EventMetadata",
+      "fields": [
+        { "name": "idempotency_key", "type": "string" },
+        { "name": "correlation_id", "type": ["null", "string"], "default": null },
+        { "name": "causation_id", "type": ["null", "string"], "default": null },
+        { "name": "ttl_seconds", "type": "int", "default": 300 }
+      ]
+    }}
+  ]
+}

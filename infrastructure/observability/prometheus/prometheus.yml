@@ -1,0 +1,86 @@
+# ============================================================
+# Prometheus Configuration — Scrape Targets
+# ============================================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+# Alerting rules
+rule_files:
+  - "alerts/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Edge Gateway metrics
+  - job_name: "edge-gateway"
+    static_configs:
+      - targets: ["edge-gateway:9090"]
+        labels:
+          service: "edge-gateway"
+          tier: "ingestion"
+
+  # Kafka broker metrics (via JMX Exporter)
+  - job_name: "kafka"
+    static_configs:
+      - targets:
+          - "kafka-1:9090"
+          - "kafka-2:9090"
+          - "kafka-3:9090"
+        labels:
+          service: "kafka"
+          tier: "messaging"
+
+  # Flink metrics
+  - job_name: "flink"
+    static_configs:
+      - targets: ["flink-jobmanager:9249"]
+        labels:
+          service: "flink"
+          tier: "processing"
+
+  # WebSocket Gateway
+  - job_name: "websocket-gateway"
+    static_configs:
+      - targets: ["websocket-gateway:9090"]
+        labels:
+          service: "websocket-gateway"
+          tier: "serving"
+
+  # REST API
+  - job_name: "rest-api"
+    static_configs:
+      - targets: ["rest-api:9090"]
+        labels:
+          service: "rest-api"
+          tier: "serving"
+
+  # Redis
+  - job_name: "redis"
+    static_configs:
+      - targets: ["redis-exporter:9121"]
+        labels:
+          service: "redis"
+          tier: "storage"
+
+  # PostgreSQL
+  - job_name: "postgres"
+    static_configs:
+      - targets: ["postgres-exporter:9187"]
+        labels:
+          service: "postgres"
+          tier: "storage"
+
+  # ClickHouse
+  - job_name: "clickhouse"
+    static_configs:
+      - targets: ["clickhouse:9363"]
+        labels:
+          service: "clickhouse"
+          tier: "analytics"
+
+  # Prometheus self-monitoring
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]

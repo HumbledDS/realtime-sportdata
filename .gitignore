@@ -3,6 +3,10 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# Plans
+plan_progressif_d_implementation.md
+realtime_architecture.md
+
 # C extensions
 *.so
 

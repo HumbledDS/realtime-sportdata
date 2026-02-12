@@ -1,0 +1,90 @@
+# Edge Gateway Configuration
+# Stadium: Parc des Princes — Paris
+
+gateway:
+  id: "gw-parc-des-princes-01"
+  stadium: "Parc des Princes"
+  city: "Paris"
+  capacity: 48583
+
+# --- Event Sources ---
+sources:
+  hawk_eye:
+    enabled: true
+    endpoint: "grpc://hawk-eye-local:50051"
+    timeout_ms: 1000
+    description: "Goal-Line Technology — 14 cameras, 500fps"
+
+  opta:
+    enabled: true
+    endpoint: "tcp://opta-feed-local:9200"
+    timeout_ms: 5000
+    description: "Stats Perform live operator feed"
+
+  referee_comms:
+    enabled: true
+    endpoint: "grpc://referee-comms-local:50052"
+    timeout_ms: 2000
+    description: "Referee communication system + VAR room"
+
+  gps_sensors:
+    enabled: true
+    endpoint: "udp://epts-local:8500"
+    timeout_ms: 500
+    description: "Player GPS/IMU sensors (EPTS)"
+
+# --- Correlation ---
+correlation:
+  # Time window to correlate signals from different sources about the same event
+  window_ms: 5000
+  # Minimum confidence to emit an event without secondary confirmation
+  min_confidence: 0.8
+  # Fields used to generate idempotency key
+  dedup_fields: ["match_id", "event_type", "match_minute", "player_id"]
+
+# --- Schema Validation ---
+validation:
+  schema_dir: "/app/config/schemas"
+  strict: true
+  reject_unknown_fields: false
+
+# --- Write-Ahead Log (WAL) ---
+wal:
+  directory: "/data/wal"
+  max_size_mb: 1024
+  max_events: 10000
+  sync_interval_ms: 100
+  compression: "lz4"
+
+# --- Kafka Producer ---
+kafka:
+  bootstrap_servers: "kafka-1:9092,kafka-2:9092,kafka-3:9092"
+  topic: "match-events-raw"
+  schema_registry_url: "http://schema-registry:8081"
+  acks: "all"
+  enable_idempotence: true
+  compression_type: "lz4"
+  linger_ms: 5
+  batch_size: 16384
+  max_in_flight: 5
+  retries: 2147483647
+  delivery_timeout_ms: 120000
+
+# --- Monitoring ---
+metrics:
+  port: 9090
+  path: "/metrics"
+  labels:
+    gateway_id: "gw-parc-des-princes-01"
+    environment: "production"
+
+# --- Health Check ---
+health:
+  port: 8080
+  path: "/health"
+
+# --- Logging ---
+logging:
+  level: "INFO"
+  format: "json"
+  output: "stdout"

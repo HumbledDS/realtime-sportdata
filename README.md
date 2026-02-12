@@ -1,4 +1,4 @@
-# ⚽ Du But au Buzz — Comment un Goal au Parc des Princes Arrive sur Ton Téléphone en 3 Secondes
+#  Du But au Buzz — Comment un Goal au Parc des Princes Arrive sur Ton Téléphone en 3 Secondes
 
 > Architecture complète d'un système événementiel temps réel pour le football professionnel.
 > Cas d'étude : PSG vs Marseille, Parc des Princes, Ligue 1.
@@ -27,7 +27,7 @@
 
 ## Vue d'ensemble
 
-Démbélé marque à la 37ᵉ minute. Tu es dans les tribunes du Parc des Princes. Tu cries. Trois secondes plus tard, ton téléphone vibre dans ta poche : **"⚽ BUT ! Démbélé (PSG) — 2-0 [37']"**.
+Démbélé marque à la 37ᵉ minute. Tu es dans les tribunes du Parc des Princes. Tu cries. Trois secondes plus tard, ton téléphone vibre dans ta poche : **" BUT ! Démbélé (PSG) — 2-0 [37']"**.
 
 Ce document explique chaque étape technique entre le ballon qui franchit la ligne et cette notification sur ton écran de verrouillage.
 
@@ -377,9 +377,9 @@ Son rôle : décider **qui doit être notifié** et **avec quel contenu**.
 │                                                        │
 │  3. TEMPLATING DU CONTENU                              │
 │                                                        │
-│     FR : "⚽ BUT ! Démbélé (PSG) — 2-0 [37']"         │
-│     EN : "⚽ GOAL! Démbélé (PSG) — 2-0 [37']"         │
-│     AR : "⚽ !هدف مبابي (باريس) — 2-0 [37']"         │
+│     FR : " BUT ! Démbélé (PSG) — 2-0 [37']"         │
+│     EN : " GOAL! Démbélé (PSG) — 2-0 [37']"         │
+│     AR : " !هدف مبابي (باريس) — 2-0 [37']"         │
 │                                                        │
 │  4. CONTRÔLE DE DÉBIT                                  │
 │     Max 1 notification par événement par utilisateur   │
@@ -766,7 +766,7 @@ Un seul événement "GOAL_SCORED"
          ├──→  Scores fantasy actualisés (Sorare, Mon Petit Gazon)
          │
          ├──→  Bots réseaux sociaux publient automatiquement
-         │         "@PSG_inside: ⚽ 37' BUUUUT DE DEMBELE ! 2-0"
+         │         "@PSG_inside:  37' BUUUUT DE DEMBELE ! 2-0"
          │
          └──→  Modèle ML de probabilité de victoire recalculé
                   PSG win probability : 62% → 78%
